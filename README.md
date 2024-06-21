@@ -39,3 +39,42 @@ data['X_binned'] = pd.cut(data['X'], bins=optimal_edges, labels=False)
 print("Binned data:")
 print(data)
 
+
+
+
+
+
+
+from scipy.stats import chi2_contingency
+
+def optimal_binning(data, predictor, target, bins=4):
+    # Sort data by predictor variable
+    data_sorted = data.sort_values(by=predictor)
+    X_sorted = data_sorted[predictor].values
+    y_sorted = data_sorted[target].values
+
+    # Initialize arrays to store optimal bin edges and criteria values
+    bin_edges = [X_sorted[0]]  # Start with the minimum value as the first bin edge
+    criteria_values = []
+
+    # Iterate through sorted values to find optimal bin edges
+    for i in range(1, bins):
+        # Calculate criterion (e.g., chi-square) for potential split points
+        split_points = np.linspace(X_sorted[0], X_sorted[-1], num=bins+1)[1:-1]
+        criteria = []
+
+        for split_point in split_points:
+            obs_table = pd.crosstab(X_sorted <= split_point, y_sorted)
+            chi2, _, _, _ = chi2_contingency(obs_table)
+            criteria.append(chi2)
+
+        # Find optimal split point based on criterion
+        optimal_split_point = split_points[np.argmax(criteria)]
+        bin_edges.append(optimal_split_point)
+        criteria_values.append(max(criteria))
+
+        # Update y_sorted to reflect new bins
+        y_sorted[X_sorted <= optimal_split_point] = i - 1
+
+    return bin_edges, criteria_values
+
