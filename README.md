@@ -78,3 +78,20 @@ def optimal_binning(data, predictor, target, bins=4):
 
     return bin_edges, criteria_values
 
+
+
+
+
+
+
+
+    
+Copy code
+from scipy.stats import chi2_contingency
+
+def optimal_binning(data, predictor, target, bins=4):
+    # Sort data by predictor variable
+    data_sorted = data.sort_values(by=predictor)
+    X_sorted = data_sorted[predictor].values
+    y_sorted = data_sorted[target].values
+
