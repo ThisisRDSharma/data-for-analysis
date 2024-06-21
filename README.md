@@ -23,3 +23,19 @@ binned_data = binning_process.transform(data)
 binning_table = binning_process.binning_table
 
 print(binning_table)
+
+
+
+
+# Perform optimal binning
+optimal_edges, criteria_values = optimal_binning(data, predictor='X', target='y', bins=4)
+
+print("Optimal bin edges:", optimal_edges)
+print("Criteria values:", criteria_values)
+
+# Bin data based on optimal edges
+data['X_binned'] = pd.cut(data['X'], bins=optimal_edges, labels=False)
+
+print("Binned data:")
+print(data)
+
