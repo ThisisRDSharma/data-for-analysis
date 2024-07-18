@@ -1,97 +1,41 @@
-openExample('mrm/CreditScorecardValidationMetricsExample')
-cvc
-
-
-from optbinning import BinningProcess
 import pandas as pd
 
-# Example data
-data = pd.DataFrame({
-    'var1': [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    'var2': [10, 15, 20, 25, 30, 35, 40, 45, 50],
-    'target': [0, 1, 0, 1, 0, 1, 0, 1, 0]
-})
+# Sample dataset
+data = {
+    'Column1': [1, 2, None, 4, 5],
+    'Column2': [None, 2, 3, None, 5]
+}
 
-# Initialize BinningProcess
-binning_process = BinningProcess(variable_names=['var1', 'var2'], target_name='target')
-
-# Fit and transform
-binning_process.fit(data)
-binned_data = binning_process.transform(data)
-
-# Get the binning information
-binning_table = binning_process.binning_table
-
-print(binning_table)
-
-
-
-
-# Perform optimal binning
-optimal_edges, criteria_values = optimal_binning(data, predictor='X', target='y', bins=4)
-
-print("Optimal bin edges:", optimal_edges)
-print("Criteria values:", criteria_values)
-
-# Bin data based on optimal edges
-data['X_binned'] = pd.cut(data['X'], bins=optimal_edges, labels=False)
-
-print("Binned data:")
-print(data)
+df = pd.DataFrame(data)
+print("Original DataFrame:")
+print(df)
 
 
 
 
 
 
-
-from scipy.stats import chi2_contingency
-
-def optimal_binning(data, predictor, target, bins=4):
-    # Sort data by predictor variable
-    data_sorted = data.sort_values(by=predictor)
-    X_sorted = data_sorted[predictor].values
-    y_sorted = data_sorted[target].values
-
-    # Initialize arrays to store optimal bin edges and criteria values
-    bin_edges = [X_sorted[0]]  # Start with the minimum value as the first bin edge
-    criteria_values = []
-
-    # Iterate through sorted values to find optimal bin edges
-    for i in range(1, bins):
-        # Calculate criterion (e.g., chi-square) for potential split points
-        split_points = np.linspace(X_sorted[0], X_sorted[-1], num=bins+1)[1:-1]
-        criteria = []
-
-        for split_point in split_points:
-            obs_table = pd.crosstab(X_sorted <= split_point, y_sorted)
-            chi2, _, _, _ = chi2_contingency(obs_table)
-            criteria.append(chi2)
-
-        # Find optimal split point based on criterion
-        optimal_split_point = split_points[np.argmax(criteria)]
-        bin_edges.append(optimal_split_point)
-        criteria_values.append(max(criteria))
-
-        # Update y_sorted to reflect new bins
-        y_sorted[X_sorted <= optimal_split_point] = i - 1
-
-    return bin_edges, criteria_values
-
-
-
-
-
-
-
-
+def find_missing_values(df, col1, col2):
+    # Create a mask for missing values in each column
+    mask_col1 = df[col1].isnull()
+    mask_col2 = df[col2].isnull()
     
-Copy code
-from scipy.stats import chi2_contingency
+    # Find the indices where there are missing values in col1 followed by non-missing values in col2
+    missing_col1_followed_by_value_col2 = mask_col1 & ~mask_col1.shift(-1) & ~mask_col2.shift(-1)
 
-def optimal_binning(data, predictor, target, bins=4):
-    # Sort data by predictor variable
-    data_sorted = data.sort_values(by=predictor)
-    X_sorted = data_sorted[predictor].values
-    y_sorted = data_sorted[target].values
+    # Find the indices where there are missing values in col2 followed by non-missing values in col1
+    missing_col2_followed_by_value_col1 = mask_col2 & ~mask_col2.shift(-1) & ~mask_col1.shift(-1)
+    
+    # Combine the indices
+    missing_indices = missing_col1_followed_by_value_col2 | missing_col2_followed_by_value_col1
+    
+    return df[missing_indices]
+
+missing_values_df = find_missing_values(df, 'Column1', 'Column2')
+print("Rows with missing values followed by non-missing values in the other column:")
+print(missing_values_df)
+
+
+
+
 
