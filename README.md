@@ -1,38 +1,40 @@
-import numpy as np
-
-# Parameters for the normal distribution
-mean = 0  # Mean of the distribution
-std_dev = 1  # Standard deviation of the distribution
-size = 100  # Number of random numbers to generate
-
-# Generate random numbers from a normal distribution
-data = np.random.normal(mean, std_dev, size)
-
-print(data)
-
-
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
 
-# Create a sample dataset (assuming you already have a dataset or DataFrame)
+# Example: Load a sample dataset (replace with your dataset loading code)
 data = {
-    'A': [1, 2, 3, 4, 5],  # Example existing data in column A
-    'B': [10, 20, 30, 40, 50]  # Example existing data in column B
+    'A': [1.2, 2.5, 3.3, 4.1, 5.7, 6.2, 7.3, 8.5, 9.0, 10.1]
 }
 
 # Convert the dictionary to a pandas DataFrame
 df = pd.DataFrame(data)
 
-# Parameters for the normal distribution
-mean = 0  # Mean of the distribution
-std_dev = 1  # Standard deviation of the distribution
-size = df.shape[0]  # Number of rows in the DataFrame
+# Select the column for which you want to fit the normal distribution
+column_name = 'A'
+column_data = df[column_name]
 
-# Generate random numbers from a normal distribution
-random_numbers = np.random.normal(mean, std_dev, size)
+# Calculate mean and standard deviation of the column
+mu = column_data.mean()
+sigma = column_data.std()
 
-# Insert these random numbers into a new column in the DataFrame
-df['C'] = random_numbers
+# Generate a range of x values for plotting the PDF
+x = np.linspace(column_data.min(), column_data.max(), 100)
+pdf = norm.pdf(x, mu, sigma)
 
-# Display the updated DataFrame
-print(df)
+# Plot the histogram of the data
+plt.hist(column_data, bins=5, density=True, alpha=0.6, color='g', label='Histogram')
+
+# Plot the PDF
+plt.plot(x, pdf, 'k-', linewidth=2, label='Normal Distribution')
+
+# Add labels and title
+plt.xlabel(column_name)
+plt.ylabel('Probability Density')
+plt.title('Normal Distribution Fit')
+plt.legend()
+
+# Show the plot
+plt.grid(True)
+plt.show()
