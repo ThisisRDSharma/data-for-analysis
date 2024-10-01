@@ -14,9 +14,6 @@ https://archive.ics.uci.edu/ml/datasets/MAGIC+Gamma+Telescope
 
 https://archive.ics.uci.edu/ml/datasets/Seoul+Bike+Sharing+Demand
 
-https://archive.ics.uci.edu/ml/datasets/seeds
+sonu bhai ka kaam !!!
 
-
-dataset link
-
-https://github.com/SarthakNegi015/CreditCardData
+https://github.com/SarthakNegi015/My_Datasets
